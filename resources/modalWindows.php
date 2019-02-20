@@ -95,7 +95,8 @@
             <form id="form3" method="POST">
                 <table class="table text-center">
                     <?php
-                        if($message == '') {
+                        if ($message == '') {
+                            if (!$client) {
                     ?>
                     <tr>
                         <th width="34.5%"><label>Klientas</label></th>
@@ -112,11 +113,12 @@
                                     }
                                     ?>
                             </select>
-                            <input type='hidden' name='post_id' value='<?php echo createPassword(64);?>'>
-                            <input type='hidden' name='date' value='<?php echo $date;?>'>
                         </td>
                         <td width="31%"><span class="error"> <?php echo $nameErr;?></span></td>                    
                     </tr>
+                        <?php
+                            }
+                        ?>                    
                     <tr>
                         <th width="34.5%"><label>Kirpėja</label></th>
                         <td width="34.5%">
@@ -132,6 +134,8 @@
                                     }
                                     ?>
                             </select>
+                            <input type='hidden' name='post_id' value='<?php echo createPassword(64);?>'>
+                            <input type='hidden' name='date' value='<?php echo $date;?>'>
                         </td>                   
                     </tr>
                     <tr>

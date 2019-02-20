@@ -1,8 +1,7 @@
 <?php
-function selectSQL($conn, $offset, $limit, $searchParameters) {
+function selectSQL($conn, $offset, $limit, $searchParameters, $toClients="") {
     $limit++;
-    //$sql = "SELECT * FROM hair_salon.times"; 
-
+   
     $sql = "SELECT time.date, count(res.date) as count, GROUP_CONCAT(res.id SEPARATOR ',') AS id, ";
     $sql .= "GROUP_CONCAT(res.client_id SEPARATOR ',') AS client_id, GROUP_CONCAT(client.name SEPARATOR ',') AS name, ";
     $sql .= "GROUP_CONCAT(res.hairdresser_id SEPARATOR ',') AS hairdresser_id, GROUP_CONCAT(hairdresser.first_name, ' ', hairdresser.last_name  SEPARATOR ',') AS employee ";
@@ -14,7 +13,12 @@ function selectSQL($conn, $offset, $limit, $searchParameters) {
         $sql .= searchParam($searchParameters);
     }
 
-    $sql .= " GROUP BY time.date ORDER BY time.date ASC LIMIT $limit OFFSET $offset";    
+    $sql .= " GROUP BY time.date ";    
+    if ($toClients) {
+        $sql .= " HAVING count != (select count(*) from hairdressers) ";
+    }    
+    $sql .= " ORDER BY time.date ASC LIMIT $limit OFFSET $offset";    
+
     $result = $conn->query($sql);    
 
     if ($result && $result->num_rows > 0) {

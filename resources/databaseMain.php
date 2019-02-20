@@ -20,10 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $clients = selectClients(connection(), $date);
         $hairdressers = selectHairdressers(connection(), $date);
         $modalWindow = 'reserve'; 
+    } else if (isset($_POST['clientreserve'])) {
+        $date = $_POST['clientreserve']; 
+        $client = true;
+        $hairdressers = selectHairdressers(connection(), $date);
+        $modalWindow = 'reserve'; 
     } else if (isset($_POST['reserveEntry'])) {
         if (!isset($_SESSION['post_id']) || ($_SESSION['post_id'] != $_POST['post_id'])) {
             $_SESSION['post_id'] = $_POST['post_id'];
-            $message = reserveTime($_POST['date'], $_POST['client_id'], $_POST['hairdresser_id'], connection());
+            $client_id = isset($_POST['client_id']) ? $_POST['client_id'] : "";
+            $message = reserveTime($_POST['date'], $client_id, $_POST['hairdresser_id'], connection());
             $modalWindow = 'reserve'; 
         }
     } else if (isset($_POST['delete'])) {

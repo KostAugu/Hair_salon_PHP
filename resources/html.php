@@ -1,66 +1,6 @@
 <?php
 
-function frontPanel ($limit) {
-    ?>
-    <div class="wrapper">
-        <h2>Radarų duomenys</h2>
-        <div id="frontDiv">
-            <form method="post" class="float-left">         
-                <button name="add" value="1" id="add" type='submit' class='btn btn-success btn-lg'>Įvesti naują įrašą</button>
-            </form>
-                <button id="filter" type='button' class='btn btn-info btn-lg float-left'>Filtruoti</button>
-        </div>
-        <div id="searchForm" class="hidden">
-            <form method="get">
-                <table>
-                    <tr>
-                        <th><label>Data</label></th>
-                        <td><input pattern="[\d,\-,:,\s]+" id="dateSearch" type="text" name="date" value="<?php echo (isset($_GET['date']) && isset($_GET['search'])) ? $_GET['date'] : ''; ?>"></td>
-                        <td><input id="dateCB" type="checkbox">Nurodyti intervalą</td>
-                        <td><input pattern="[\d,\-,:,\s]+" id="dateInterval1" type="text" name="dateInterval[0]" value="<?php echo (isset($_GET['dateInterval'][0]) && isset($_GET['search'])) ? $_GET['dateInterval'][0] : ''; ?>" disabled></td>
-                        <td><input pattern="[\d,\-,:,\s]+" id="dateInterval2" type="text" name="dateInterval[1]" value="<?php echo (isset($_GET['dateInterval'][1]) && isset($_GET['search'])) ? $_GET['dateInterval'][1] : ''; ?>" disabled></td>
-                    </tr>    
-                    <tr>
-                        <th><label>Automobilio numeris</label></th>
-                        <td><input pattern="[A-Z|\d]{1,6}" type="text" name="number" value="<?php echo (isset($_GET['number']) && isset($_GET['search'])) ? $_GET['number'] : ''; ?>"></td>
-                    </tr> 
-                    <tr>
-                        <th><label>Atstumas</label></th>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="distanceSearch" type="text" name="distance" value="<?php echo (isset($_GET['distance']) && isset($_GET['search'])) ? $_GET['distance'] : ''; ?>"></td>
-                        <td><input id="distanceCB" type="checkbox">Nurodyti intervalą</td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="distanceInterval1" type="text" name="distanceInterval[0]" value="<?php echo (isset($_GET['distanceInterval'][0]) && isset($_GET['search'])) ? $_GET['distanceInterval'][0] : ''; ?>" disabled></td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="distanceInterval2" type="text" name="distanceInterval[1]" value="<?php echo (isset($_GET['distanceInterval'][1]) && isset($_GET['search'])) ? $_GET['distanceInterval'][1] : ''; ?>" disabled></td>
-                    </tr> 
-                    <tr>
-                        <th><label>Laikas</label></th>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="timeSearch" type="text" name="time" value="<?php echo (isset($_GET['time']) && isset($_GET['search'])) ? $_GET['time'] : ''; ?>"></td>
-                        <td><input id="timeCB" type="checkbox">Nurodyti intervalą</td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="timeInterval1" type="text" name="timeInterval[0]" value="<?php echo (isset($_GET['timeInterval'][0]) && isset($_GET['search'])) ? $_GET['timeInterval'][0] : ''; ?>" disabled></td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="timeInterval2" type="text" name="timeInterval[1]" value="<?php echo (isset($_GET['timeInterval'][1]) && isset($_GET['search'])) ? $_GET['timeInterval'][1] : ''; ?>" disabled></td>
-                    </tr> 
-                    <tr>
-                        <th><label>Greitis</label></th>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="speedSearch" type="text" name="speed" value="<?php echo (isset($_GET['speed']) && isset($_GET['search'])) ? $_GET['speed'] : ''; ?>"></td>
-                        <td><input id="speedCB" type="checkbox">Nurodyti intervalą</td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="speedInterval1" type="text" name="speedInterval[0]" value="<?php echo (isset($_GET['speedInterval'][0]) && isset($_GET['search'])) ? $_GET['speedInterval'][0] : ''; ?>" disabled></td>
-                        <td><input pattern="\d+(\.)?(\d+)?" id="speedInterval2" type="text" name="speedInterval[1]" value="<?php echo (isset($_GET['speedInterval'][1]) && isset($_GET['search'])) ? $_GET['speedInterval'][1] : ''; ?>" disabled></td>
-                    </tr> 
-                    <tr class="text-center">
-                        <td colspan="4">
-                            <input class="btn btn-primary btn-lgt" type="submit" name="search" >
-                            <input type='hidden' name='limit' value='<?php echo $limit;?>'>
-                        </td>
-                        <td colspan="0.5"><button id="clean" type='button' class='btn btn-warning btn-lgt'>Išvalyti</button></td>
-                        <td colspan="0.5"><button id="hide" type='button' class='btn btn-warning btn-lgt'>Slėpti</button></td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    <div>
-    <?php
-}
-
-function table ($result, $offset, $limit) {
+function table ($result, $offset, $limit, $toClients="") {
     ?>
     <div class="w-80 p-3 mx-auto">
         <table id="datatable" class="table table-striped table-hover text-center" cellspacing="0" width="100%">
@@ -71,11 +11,17 @@ function table ($result, $offset, $limit) {
                     <th>
                         <table style="width: 100%">
                             <thead>
+                            <?php
+                            if (!$toClients) {
+                            ?>
                                 <tr>
                                     <th style="width: 24%">Klientas</th>
                                     <th style="width: 32%">Kirpėja</th>
                                     <th style="width: 44%">Veiksmai</th>
                                 </tr>
+                            <?php
+                            }
+                            ?>    
                             </thead>
                         </table>
                     </th>
@@ -109,26 +55,28 @@ function table ($result, $offset, $limit) {
                     <table style="width: 100%">
                         <tbody>
                             <?php
-                            for ($j=0; $j<$count; $j++) {
-                            ?>
-                            <tr>
-                                <td style="width: 24%"><?php echo $client[$j]; ?></td>
-                                <td style="width: 32%"><?php echo $hairdresser[$j]; ?></td>
-                                <td style="width: 44%">
-                                    <form method="post">
-                                        <input type='hidden' name='date' value='<?php echo $date;?>'>
-                                        <button name="edit" value="<?php echo $id[$j]; ?>" id="edit" type='submit' class='btn btn-warning btn-sm'><span>Koreguoti</span></button>
-                                        <button name="delete" value="<?php echo $id[$j]; ?>" id="delete" type='submit' class='btn btn-danger btn-sm'><span>Atšaukti rezervaciją</span></button>
-                                    </form> 
-                                </td>
-                            </tr>
-                            <?php
+                            if (!$toClients) {
+                                for ($j=0; $j<$count; $j++) {
+                                ?>
+                                <tr>
+                                    <td style="width: 24%"><?php echo $client[$j]; ?></td>
+                                    <td style="width: 32%"><?php echo $hairdresser[$j]; ?></td>
+                                    <td style="width: 44%">
+                                        <form method="post">
+                                            <input type='hidden' name='date' value='<?php echo $date;?>'>
+                                            <button name="edit" value="<?php echo $id[$j]; ?>" id="edit" type='submit' class='btn btn-warning btn-sm'><span>Koreguoti</span></button>
+                                            <button name="delete" value="<?php echo $id[$j]; ?>" id="delete" type='submit' class='btn btn-danger btn-sm'><span>Atšaukti rezervaciją</span></button>
+                                        </form> 
+                                    </td>
+                                </tr>
+                                <?php
+                                }
                             }
                             ?>
                             <tr>
                                 <td colspan="4" style="width: 100%">
                                     <form method="post">
-                                        <button name="reserve" value="<?php echo $date; ?>" id="reserve" type='submit' class='btn btn-success btn-sm'><span>Pridėti rezervaciją</span></button>
+                                        <button name="<?php echo $toClients ? "client" : ""; ?>reserve" value="<?php echo $date; ?>" id="reserve" type='submit' class='btn btn-success btn-sm'><span>Pridėti rezervaciją</span></button>
                                     </form> 
                                 </td>
                             </tr>                            
