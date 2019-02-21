@@ -1,6 +1,6 @@
 <?php
 
-function table ($result, $offset, $limit, $toClients="") {
+function table ($result, $offset, $limit, $toClients="", $clientSessionId="") {
     ?>
     <div class="w-80 p-3 mx-auto">
         <table id="datatable" class="table table-striped table-hover text-center" cellspacing="0" width="100%">
@@ -75,9 +75,17 @@ function table ($result, $offset, $limit, $toClients="") {
                             ?>
                             <tr>
                                 <td colspan="4" style="width: 100%">
+                                <?php
+                                if (!empty($clientSessionId)) {
+                                    echo "Laikas rezervuotas klientui: " . $client[0];
+                                } else {
+                                ?>
                                     <form method="post">
                                         <button name="<?php echo $toClients ? "client" : ""; ?>reserve" value="<?php echo $date; ?>" id="reserve" type='submit' class='btn btn-success btn-sm'><span>Pridėti rezervaciją</span></button>
                                     </form> 
+                                <?php
+                                }
+                                ?>    
                                 </td>
                             </tr>                            
                         </tbody>

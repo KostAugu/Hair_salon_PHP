@@ -1,5 +1,5 @@
 <?php
-function selectSQL($conn, $offset, $limit, $searchParameters, $toClients="") {
+function selectSQL($conn, $offset, $limit, $searchParameters, $toClients="", $sessionId="") {
     $limit++;
    
     $sql = "SELECT time.date, count(res.date) as count, GROUP_CONCAT(res.id SEPARATOR ',') AS id, ";
@@ -11,6 +11,10 @@ function selectSQL($conn, $offset, $limit, $searchParameters, $toClients="") {
     if (!empty($searchParameters)) {
         $sql .= " WHERE ";
         $sql .= searchParam($searchParameters);
+    }
+
+    if (!empty($sessionId)) {
+        $sql .= " WHERE client.session = '$sessionId'";
     }
 
     $sql .= " GROUP BY time.date ";    
@@ -177,7 +181,9 @@ function reserveTime($date, $client_id, $hairdresser_id, $conn) {
     }
     if (!$stmt->execute()) {
         echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;    
-    } else {
+    } else {        
+        $update = "UPDATE hair_salon.clients SET visits=(visits+1) WHERE id=$client_id";
+        $conn->query($update);
         $stmt->close();
         $conn->close();
         return "Laikas rezervuotas sėkmingai.";
@@ -298,6 +304,79 @@ function checkReservationClient($id, $conn) {
             return true;
         } else {
             return false;
+        }        
+    }
+}
+
+function checkSession($sessionid, $conn) {
+    $sql = "SELECT id FROM hair_salon.clients WHERE session=?";
+    if (!($stmt = $conn->prepare($sql))) {
+        die("Error: " . $conn->error);
+    }                
+    if (!$stmt->bind_param("s", $sessionid)) { 
+        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    }
+    if (!$stmt->execute()) {
+        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;         
+    } else {
+        $stmt->bind_result($client_id);
+        $stmt->fetch();
+        $stmt->close();
+        $conn->close();
+        if (empty($client_id)) {
+            return true;
+        } else {
+            return false;
+        }        
+    }
+}
+
+function checkClient($name, $sessionid, $conn) {
+    $sql = "SELECT id FROM hair_salon.clients WHERE name=?";
+    if (!($stmt = $conn->prepare($sql))) {
+        die("Error: " . $conn->error);
+    }                
+    if (!$stmt->bind_param("s", $name)) { 
+        echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    }
+    if (!$stmt->execute()) {
+        echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;         
+    } else {
+        $stmt->bind_result($client_id);
+        $stmt->fetch();
+        $stmt->close();
+
+        if (empty($client_id)) {
+            $insert = "INSERT INTO hair_salon.clients (name, session, visits) VALUES (?, ?, 0)";
+            if (!($stmt = $conn->prepare($insert))) {
+                die("Error: " . $conn->error);
+            }                
+            if (!$stmt->bind_param("ss", $name, $sessionid)) { 
+                echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            }
+            if (!$stmt->execute()) {
+                echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;    
+            } else {
+                $client_id = $stmt->insert_id;                
+                $stmt->close();
+                $conn->close();
+                return $client_id;
+            }
+        } else {
+            $update = "UPDATE hair_salon.clients SET name=?, session=? WHERE id=?";
+            if (!($stmt = $conn->prepare($update))) {
+                die("Error: " . $conn->error);
+            }                
+            if (!$stmt->bind_param("ssi", $name, $sessionid, $client_id)) { 
+                echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            }
+            if (!$stmt->execute()) {
+                echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;    
+            } else {         
+                $stmt->close();
+                $conn->close();
+                return $client_id;
+            }            
         }        
     }
 }

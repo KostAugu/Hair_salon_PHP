@@ -13,7 +13,7 @@
 displayModal($modalWindow);
 selection();
 pagesList(selectSQL(connection(), $offset, $limit, $searchParameters), $limit, $offset, $offsetLink, $searchParameters);
-table(selectSQL(connection(), $offset, $limit, $searchParameters, true), $offset, $limit, true);
+table(selectSQL(connection(), $offset, $limit, $searchParameters, true, $clientSessionId), $offset, $limit, true, $clientSessionId);
 selection();
 pagesList(selectSQL(connection(), $offset, $limit, $searchParameters), $limit, $offset, $offsetLink, $searchParameters);
 ?>

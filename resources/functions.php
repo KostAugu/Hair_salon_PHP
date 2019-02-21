@@ -29,7 +29,9 @@ function displayModal($modalWindow) {
         echo "<script>$('#deleteClientForm').modal({backdrop: 'static', keyboard: false}, 'show');</script>";
     } else if ($modalWindow == 'editClient') {
         echo "<script>$('#editClientForm').modal({backdrop: 'static', keyboard: false}, 'show');</script>";
-    }
+    } else if ($modalWindow == 'clientReserve') {
+        echo "<script>$('#clientReserveForm').modal({backdrop: 'static', keyboard: false}, 'show');</script>";
+    }    
 }
 
 function offsetLink () {

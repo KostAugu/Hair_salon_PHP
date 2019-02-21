@@ -3,7 +3,7 @@ session_start();
 $dateErr=$clientErr=$hairdresserErr=$activeErr=$client_idErr=$visitsErr=$nameErr=$first_nameErr=$last_nameErr='';
 $date=$client=$hairdresser=$active=$client_id=$visits=$name=$first_name=$last_name="";
 $id = null;
-$modalWindow=$reservation=$client = '';
+$modalWindow=$reservation=$client=$clientSessionId = '';
 $message = '';
 $clients=$hairdressers=[];
 $searchParameters = [];

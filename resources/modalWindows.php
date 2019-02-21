@@ -96,7 +96,6 @@
                 <table class="table text-center">
                     <?php
                         if ($message == '') {
-                            if (!$client) {
                     ?>
                     <tr>
                         <th width="34.5%"><label>Klientas</label></th>
@@ -115,10 +114,7 @@
                             </select>
                         </td>
                         <td width="31%"><span class="error"> <?php echo $nameErr;?></span></td>                    
-                    </tr>
-                        <?php
-                            }
-                        ?>                    
+                    </tr>                  
                     <tr>
                         <th width="34.5%"><label>Kirpėja</label></th>
                         <td width="34.5%">
@@ -289,6 +285,63 @@
                 <?php
                     }
                 ?>
+                </table>
+            </form>
+                <h3 class="success"><?php echo $message;?></h3>
+            </div>
+        </div>    
+    </div>
+</div>
+
+<!-- Modal client reserve window -->
+<div class="modal fade" id="clientReserveForm" role="dialog">
+    <div class="modal-dialog">       
+        <div class="modal-content">
+            <div class="modal-header">                
+                <h4 class="modal-title">Rezervavimas</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+            <form id="form7" method="POST">
+                <table class="table text-center">
+                    <?php
+                        if ($message == '') {
+                    ?>
+                    <tr>
+                        <th width="34.5%"><label>Klientas</label></th>
+                        <td width="34.5%">
+                            <input type='text' name='name' placeholder="Įveskite savo vardą">
+                        </td>
+                        <td width="31%"><span class="error"> <?php echo $nameErr;?></span></td>                    
+                    </tr>                
+                    <tr>
+                        <th width="34.5%"><label>Kirpėja</label></th>
+                        <td width="34.5%">
+                            <select type='select' name='hairdresser_id' required='true' >
+                                <option value="" disabled selected>Pasirinkite kirpėją</option>
+                                    <?php
+                                    if (!empty($hairdressers)) {
+                                        for ($i = 0; $i<count($hairdressers); $i++) {                                            
+                                        ?>
+                                            <option value="<?php echo $hairdressers[$i]['id']; ?>"><?php echo $hairdressers[$i]['first_name'] . " " . $hairdressers[$i]['last_name']; ?></option>
+                                    <?php
+                                        }
+                                    }
+                                    ?>
+                            </select>
+                            <input type='hidden' name='post_id' value='<?php echo createPassword(64);?>'>
+                            <input type='hidden' name='date' value='<?php echo $date;?>'>
+                        </td>                   
+                    </tr>
+                    <tr>
+                        <td width="100%">                            
+                            <button class="btn btn-warning btn-lg" id="clientReserveEntry" type="submit" form="form7" name="clientReserveEntry" value="Submit">Rezervuoti</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Atgal</button>
+                        </td>
+                    </tr>
+                    <?php
+                        }
+                    ?>
                 </table>
             </form>
                 <h3 class="success"><?php echo $message;?></h3>

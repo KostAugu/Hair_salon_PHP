@@ -1,4 +1,8 @@
 <?php
+if (!checkSession(session_id(), connection())) {
+    $clientSessionId = session_id();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['employeeEntry'])) {
         if(!isset($_SESSION['post_id']) || ($_SESSION['post_id'] != $_POST['post_id']) ){
@@ -21,10 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hairdressers = selectHairdressers(connection(), $date);
         $modalWindow = 'reserve'; 
     } else if (isset($_POST['clientreserve'])) {
-        $date = $_POST['clientreserve']; 
-        $client = true;
+        $date = $_POST['clientreserve'];
         $hairdressers = selectHairdressers(connection(), $date);
-        $modalWindow = 'reserve'; 
+        $modalWindow = 'clientReserve';
+    } else if (isset($_POST['clientReserveEntry'])) {
+        if (!isset($_SESSION['post_id']) || ($_SESSION['post_id'] != $_POST['post_id'])) {
+            $_SESSION['post_id'] = $_POST['post_id'];
+            $name = $_POST['name'];
+            //check for name, if not found save it
+            $client_id = checkClient($name, session_id(), connection());
+            $message = reserveTime($_POST['date'], $client_id, $_POST['hairdresser_id'], connection());
+            $modalWindow = 'reserve'; 
+        }
     } else if (isset($_POST['reserveEntry'])) {
         if (!isset($_SESSION['post_id']) || ($_SESSION['post_id'] != $_POST['post_id'])) {
             $_SESSION['post_id'] = $_POST['post_id'];
